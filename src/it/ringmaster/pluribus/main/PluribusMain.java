@@ -1,6 +1,6 @@
-package it.ringmaster.pluribus.classes;
+package it.ringmaster.pluribus.main;
 
-import it.ringmaster.pluribus.main.History;
+import it.ringmaster.pluribus.classes.History;
 
 public class PluribusMain {
 

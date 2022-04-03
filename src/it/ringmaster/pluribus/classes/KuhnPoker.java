@@ -1,4 +1,4 @@
-package it.ringmaster.pluribus.main;
+package it.ringmaster.pluribus.classes;
 
 import java.util.Arrays;
 import java.util.List;

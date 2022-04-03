@@ -1,4 +1,4 @@
-package it.ringmaster.pluribus.main;
+package it.ringmaster.pluribus.classes;
 
 public class History {
 	
