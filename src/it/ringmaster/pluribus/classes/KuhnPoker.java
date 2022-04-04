@@ -38,7 +38,7 @@ public class KuhnPoker {
 		}
 		else //CC or BB or CBB
 		{
-			int payoff = 2 - (history.contains("B") ? 1 : 0);
+			int payoff = 2 - (history.contains("B") ? 0 : 1);
 			String p1_card = cards.get(0);
 			String p2_card = cards.get(1);
 			if (p1_card.equals("K") || p2_card.equals("J"))
