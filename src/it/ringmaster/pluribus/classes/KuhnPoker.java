@@ -5,7 +5,7 @@ import java.util.List;
 
 public class KuhnPoker {
 
-	private static List<String> terminalValues = Arrays.asList("BC","BB","CC","CBB","CBC");
+	private final static List<String> terminalValues = Arrays.asList("BC","BB","CC","CBB","CBC");
 
 	/**
 	 * Verifies if the actual node is a terminal node

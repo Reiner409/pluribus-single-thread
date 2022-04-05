@@ -1,6 +1,6 @@
 package it.ringmaster.pluribus.classes;
 
-import it.ringmaster.pluribus.global.Global;
+import it.ringmaster.pluribus.global.Action;
 
 public class InformationSet {
 	
@@ -10,11 +10,11 @@ public class InformationSet {
 	
 	public InformationSet()
 	{
-		this.regret_sum = new int[Global.Actions.length];
-		this.strategy_sum = new int[Global.Actions.length];
-		this.num_actions = Global.Actions.length;
+		this.regret_sum = new int[Action.Actions.length];
+		this.strategy_sum = new int[Action.Actions.length];
+		this.num_actions = Action.Actions.length;
 		
-		for(int i = 0;i<Global.Actions.length;i++)
+		for(int i = 0;i<Action.Actions.length;i++)
 		{
 			this.regret_sum[i] = 0;
 			this.strategy_sum[i] = 0;

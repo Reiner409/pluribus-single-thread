@@ -2,14 +2,14 @@ package it.ringmaster.pluribus.classes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
-import it.ringmaster.pluribus.global.Global;
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
+
+import it.ringmaster.pluribus.global.Action;
 
 public class PluribusTrainer {
 
@@ -30,7 +30,7 @@ public class PluribusTrainer {
 
 	public InformationSet cache_and_get_information_set(String card_and_history)
 	{
-		if (this.infoset_map.containsKey(card_and_history))
+		if (!this.infoset_map.containsKey(card_and_history))
 			this.infoset_map.put(card_and_history, new InformationSet());
 		return infoset_map.get(card_and_history);
 	}
@@ -49,8 +49,14 @@ public class PluribusTrainer {
 
 		if(turn_player == traverser)
 		{
-			int random_action = ;
-			String action = Global.Actions[random_action];
+			
+			int[] numToGenerate = new int[]{0,1};
+            EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(
+            		numToGenerate, Arrays.stream(strategy).asDoubleStream().toArray());
+            
+            // Sample a number according to the distribuiton and pick the corresponding action
+            int random_action = distribution.sample();
+			String action = Action.Actions[random_action];
 			info_set.getStrategy_sum()[random_action] += 1;
 			history.forward(action);
 			this.update_strategy(cards, history, traverser);
@@ -58,7 +64,7 @@ public class PluribusTrainer {
 		}
 		else
 		{
-			for (String action : Global.Actions) 
+			for (String action : Action.Actions) 
 			{
 				history.forward(action);
 				this.update_strategy(cards, history, traverser);
@@ -81,17 +87,18 @@ public class PluribusTrainer {
 
 		if (turn_player == traverser)
 		{
-			List<String> explored = Arrays.asList(Global.Actions);
-			int[] v_h_a = new int[Global.Actions.length];
+			List<String> explored = Arrays.asList(Action.Actions);
+			//v_h_a -> payoff received by a certain action
+			int[] v_h_a = new int[Action.Actions.length];
 			for(int i = 0;i<v_h_a.length;i++)
 			{
 				v_h_a[i] = 0;
 			}
 			int v_h = 0;
 
-			for(int ix = 0;ix<Global.Actions.length;ix++)
+			for(int ix = 0;ix<Action.Actions.length;ix++)
 			{
-				String action = Global.Actions[ix];
+				String action = Action.Actions[ix];
 
 				if (prune && info_set.getRegret_sum()[ix] <= this.regret_min)
 				{
@@ -107,8 +114,8 @@ public class PluribusTrainer {
 			}
 			for (String action : explored) {
 				int ix;
-				for (int i=0; i<Global.Actions.length;i++) {
-					if(Global.Actions[i].equals(action))
+				for (int i=0; i<Action.Actions.length;i++) {
+					if(Action.Actions[i].equals(action))
 					{
 						ix = i;
 						info_set.getRegret_sum()[ix] += (v_h_a[ix] - v_h);
@@ -120,11 +127,14 @@ public class PluribusTrainer {
 		}
 		else
 		{
-			//Calculating a random int
-			Random rand = new Random();
-			int randomValue = rand.nextInt(Global.Actions.length-1);
-			String random_action = Global.Actions[randomValue];
-			history.forward(random_action);
+			//Calculating a random int based on the strategy probability
+			int[] numToGenerate = new int[]{0,1};
+            EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(numToGenerate, Arrays.stream(strategy).asDoubleStream().toArray());
+
+            // Sample a number according to the distribuiton and pick the corresponding action
+            int random_action = distribution.sample();
+			String action = Action.Actions[random_action];
+			history.forward(action);
 			int v_h = this.traverse_mc_cfr(cards, history, traverser, prune);
 			history.backward();
 			return v_h;
@@ -139,15 +149,20 @@ public class PluribusTrainer {
 		for (int t=1; t<iterations; t++)
 		{
 			Random rand = new Random();
-			int p0_card = rand.nextInt(Global.Actions.length-1);
-			int p1_card;
+			
+			//TODO
+			//Copy the list and then sort a number and pop that item from the copied list.
+			int p0_card = rand.nextInt(kuhn_cards.length-1);
+			int p1_card_tmp = p0_card;
 
 			do
 			{
-				p1_card = rand.nextInt(Global.Actions.length-1);
-			}
-			while(p0_card == p1_card);
-
+				p1_card_tmp = rand.nextInt(kuhn_cards.length-1);
+			}			
+			while(p0_card == p1_card_tmp);
+			
+			final int p1_card = p1_card_tmp;
+			
 			List<String> cards = new ArrayList<String>() {{
 				add(kuhn_cards[p0_card]);
 				add(kuhn_cards[p1_card]);
@@ -171,16 +186,23 @@ public class PluribusTrainer {
 			if (t < LCFR_Threshold && t % discount_Interval == 0)
 			{
 				float discounted = (t/discount) / (t/discount + 1);
-				for(int i=0; i<infoset_map.size();i++)
+				for(String i_set_key : infoset_map.keySet())
 				{
-					Set<String> i_set_key = infoset_map.keySet();
-					Collection<InformationSet> i_set_val = infoset_map.values();
-					for (InformationSet i_r : i_set_val) {
-						i_r[] *= discounted;
+					InformationSet i_set_val = infoset_map.get(i_set_key);
+					for (int i_r=0; i_r<i_set_val.getRegret_sum().length;i_r++) {
+						i_set_val.getRegret_sum()[i_r]*= discounted;
 					}
+					for (int i_s=0; i_s<i_set_val.getStrategy_sum().length;i_s++) {
+						i_set_val.getStrategy_sum()[i_s] *= discounted;					}
 				}
 			}
 		}
+		return util;
 	}
+
+	public Map<String, InformationSet> getInfoset_map() {
+		return infoset_map;
+	}
+	
 
 }

@@ -1,11 +1,11 @@
 package it.ringmaster.pluribus.global;
 
-public class Global {
+public class Action {
 	
 	//bet/call vs check/fold
 	public static String[] Actions;
 	
-	public Global() {
+	public Action() {
 		Actions = new String[] {"B","C"};
 	}
 	
