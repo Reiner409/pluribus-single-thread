@@ -3,13 +3,14 @@ package it.ringmaster.pluribus.classes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 
-import it.ringmaster.pluribus.global.Action;
+import it.ringmaster.pluribus.action.Action;
 
 public class PluribusTrainer {
 
@@ -45,14 +46,14 @@ public class PluribusTrainer {
 		String info_key = turn_card + history.getH();
 		InformationSet info_set = this.cache_and_get_information_set(info_key);
 
-		int[] strategy = info_set.get_strategy();
+		double[] strategy = info_set.get_strategy();
 
 		if(turn_player == traverser)
 		{
 			
 			int[] numToGenerate = new int[]{0,1};
             EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(
-            		numToGenerate, Arrays.stream(strategy).asDoubleStream().toArray());
+            		numToGenerate, strategy);
             
             // Sample a number according to the distribuiton and pick the corresponding action
             int random_action = distribution.sample();
@@ -83,11 +84,12 @@ public class PluribusTrainer {
 		String info_key = turn_card + history.getH();
 		InformationSet info_set = this.cache_and_get_information_set(info_key);
 
-		int[] strategy = info_set.get_strategy();
+		double[] strategy = info_set.get_strategy();
 
 		if (turn_player == traverser)
 		{
-			List<String> explored = Arrays.asList(Action.Actions);
+			List<String> explored = new LinkedList<String>();
+			explored.addAll(Arrays.asList(Action.Actions));
 			//v_h_a -> payoff received by a certain action
 			int[] v_h_a = new int[Action.Actions.length];
 			for(int i = 0;i<v_h_a.length;i++)
@@ -129,7 +131,7 @@ public class PluribusTrainer {
 		{
 			//Calculating a random int based on the strategy probability
 			int[] numToGenerate = new int[]{0,1};
-            EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(numToGenerate, Arrays.stream(strategy).asDoubleStream().toArray());
+            EnumeratedIntegerDistribution distribution = new EnumeratedIntegerDistribution(numToGenerate, strategy);
 
             // Sample a number according to the distribuiton and pick the corresponding action
             int random_action = distribution.sample();
@@ -144,29 +146,20 @@ public class PluribusTrainer {
 	public int[] train(int iterations, int[] PLAYERS, int strategy_interval, int prune_Threshold, int LCFR_Threshold, int discount_Interval, int discount)
 	{
 		int[] util = new int[] {0, 0};
-		String[] kuhn_cards= new String[] {"J","Q","K"};
+		List<String> kuhn_cards= new ArrayList<String>();
+		kuhn_cards.add("J");
+		kuhn_cards.add("Q");
+		kuhn_cards.add("K");
 
 		for (int t=1; t<iterations; t++)
 		{
 			Random rand = new Random();
 			
-			//TODO
-			//Copy the list and then sort a number and pop that item from the copied list.
-			int p0_card = rand.nextInt(kuhn_cards.length-1);
-			int p1_card_tmp = p0_card;
-
-			do
-			{
-				p1_card_tmp = rand.nextInt(kuhn_cards.length-1);
-			}			
-			while(p0_card == p1_card_tmp);
+			int discardCard = rand.nextInt(kuhn_cards.size());
 			
-			final int p1_card = p1_card_tmp;
-			
-			List<String> cards = new ArrayList<String>() {{
-				add(kuhn_cards[p0_card]);
-				add(kuhn_cards[p1_card]);
-			}};
+			List<String> cards = new ArrayList<String>();
+			cards.addAll(kuhn_cards);
+			cards.remove(discardCard);
 
 			for (int p_i : PLAYERS) {
 				if (t % strategy_interval == 0)

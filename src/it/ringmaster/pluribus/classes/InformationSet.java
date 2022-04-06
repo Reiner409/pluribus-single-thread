@@ -1,17 +1,17 @@
 package it.ringmaster.pluribus.classes;
 
-import it.ringmaster.pluribus.global.Action;
+import it.ringmaster.pluribus.action.Action;
 
 public class InformationSet {
 	
-	private int[] regret_sum;
-	private int[] strategy_sum;
+	private double[] regret_sum;
+	private double[] strategy_sum;
 	private int num_actions;
 	
 	public InformationSet()
 	{
-		this.regret_sum = new int[Action.Actions.length];
-		this.strategy_sum = new int[Action.Actions.length];
+		this.regret_sum = new double[Action.Actions.length];
+		this.strategy_sum = new double[Action.Actions.length];
 		this.num_actions = Action.Actions.length;
 		
 		for(int i = 0;i<Action.Actions.length;i++)
@@ -25,11 +25,11 @@ public class InformationSet {
 	 * @param strategy
 	 * @return The normalized strategy
 	 */
-	public int[] normalize(int[] strategy)
+	public double[] normalize(double[] strategy)
 	{
 		//Normalization
-		int sum_strategy = 0;
-		for (int value : strategy) {
+		double sum_strategy = 0;
+		for (double value : strategy) {
 			sum_strategy += value;
 		}
 		
@@ -48,7 +48,7 @@ public class InformationSet {
 			// num_actions dimension array (e.g.: [0.33, 0.33, 0.33])
 			for(int i=0;i<this.num_actions;i++)
 			{
-				strategy[i] = 1/this.num_actions;
+				strategy[i] = (double) (1) /this.num_actions;
 			}
 		}
 		return strategy;
@@ -58,9 +58,9 @@ public class InformationSet {
 	 * This method returns an array full of numbers -> 0<=x<=1, which the sum must be equal to 1.
 	 * @return
 	 */
-	public int[] get_strategy()
+	public double[] get_strategy()
 	{
-		int[] strategy = new int[this.num_actions];
+		double[] strategy = new double[this.num_actions];
 		for(int i=0;i<this.num_actions;i++) {
 			strategy[i] = (this.regret_sum[i] > 0) ? regret_sum[i] : 0;
 		}
@@ -72,18 +72,18 @@ public class InformationSet {
 	 * Gets a clone of the normalized array for the strategy.
 	 * @return The strategy array normalized.
 	 */
-	public int[] get_average_strategy()
+	public double[] get_average_strategy()
 	{
 		//Check the clone method since it could lead to errors while modifying
 		//the actual array.
 		return this.normalize(strategy_sum.clone());
 	}
 	
-	public int[] getRegret_sum() {
+	public double[] getRegret_sum() {
 		return regret_sum;
 	}
 
-	public int[] getStrategy_sum() {
+	public double[] getStrategy_sum() {
 		return strategy_sum;
 	}
 

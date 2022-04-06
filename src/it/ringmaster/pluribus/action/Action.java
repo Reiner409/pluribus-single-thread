@@ -1,4 +1,4 @@
-package it.ringmaster.pluribus.global;
+package it.ringmaster.pluribus.action;
 
 public class Action {
 	
