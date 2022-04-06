@@ -160,6 +160,16 @@ public class PluribusTrainer {
 			List<String> cards = new ArrayList<String>();
 			cards.addAll(kuhn_cards);
 			cards.remove(discardCard);
+			
+			//Reversing the list elements since the player 0 would've never
+			//be able to get the K card
+			if(rand.nextInt(2) == 1)
+			{
+				String tmp_first_card = cards.get(0);
+				cards.set(0, cards.get(1));
+				cards.set(1, tmp_first_card);
+				
+			}
 
 			for (int p_i : PLAYERS) {
 				if (t % strategy_interval == 0)

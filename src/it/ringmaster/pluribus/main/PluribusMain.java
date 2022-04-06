@@ -17,15 +17,15 @@ public class PluribusMain {
 		new Action();
 
 		//number of players = 2
-		int[] Players = new int[2];
+		int[] Players = new int[] {0,1};
 
-		int iterations = 50000;
+		int iterations = 50_000;
 		int strategy_Interval = 10;
-		int prune_Threshold = 5000;
-		int LCFR_Threshold = 5000;
+		int prune_Threshold = 5_000;
+		int LCFR_Threshold = 5_000;
 		int discount_Interval = 10;
 		int discount = 10;
-		int regret_min = -300000;
+		int regret_min = -300_000;
 
 		PluribusTrainer mcCFR_trainer = new PluribusTrainer(regret_min);
 		int[] utility = mcCFR_trainer.train(iterations, Players, strategy_Interval, prune_Threshold, LCFR_Threshold, discount_Interval, discount);
@@ -38,7 +38,7 @@ public class PluribusMain {
 		Collections.sort(sorted_keys,new Comparator<String>() {
 			@Override
 			public int compare(String o1, String o2) {
-				return o1.length()-o2.length();
+				return o1.length() - o2.length();
 			}
 		});
 		
