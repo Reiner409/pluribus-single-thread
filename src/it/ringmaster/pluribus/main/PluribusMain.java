@@ -24,13 +24,14 @@ public class PluribusMain {
 		int prune_Threshold = 5_000;
 		int LCFR_Threshold = 5_000;
 		int discount_Interval = 10;
-		int discount = 10;
+		double discount = 10;
 		int regret_min = -300_000;
 
 		PluribusTrainer mcCFR_trainer = new PluribusTrainer(regret_min);
-		int[] utility = mcCFR_trainer.train(iterations, Players, strategy_Interval, prune_Threshold, LCFR_Threshold, discount_Interval, discount);
+		double[] utility = mcCFR_trainer.train(iterations, Players, strategy_Interval, prune_Threshold, LCFR_Threshold, discount_Interval, discount);
 
-		System.out.println("Players utility -> " + printArrayInt(utility));
+		
+		System.out.println("Players utility -> " + printArrayDouble(utility));
 
 		
 		List<String> sorted_keys = new LinkedList<>(); 
@@ -70,12 +71,4 @@ public class PluribusMain {
 		return s.toString();
 	}
 	
-	private static String printArrayInt(int[] array)
-	{
-		StringBuilder s = new StringBuilder();
-		for (int i : array) {
-			s.append(i + " ");
-		}
-		return s.toString();
-	}
 }

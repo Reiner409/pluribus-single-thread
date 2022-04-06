@@ -2,11 +2,13 @@ package it.ringmaster.pluribus.classes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 
@@ -74,7 +76,7 @@ public class PluribusTrainer {
 		}
 	}
 
-	public int traverse_mc_cfr(List<String> cards, History history, int traverser, boolean prune)
+	public double traverse_mc_cfr(List<String> cards, History history, int traverser, boolean prune)
 	{
 		if (KuhnPoker.is_terminal(history.getH()))
 			return KuhnPoker.get_payoffs(history.getH(), cards)[traverser];
@@ -91,12 +93,12 @@ public class PluribusTrainer {
 			List<String> explored = new LinkedList<String>();
 			explored.addAll(Arrays.asList(Action.Actions));
 			//v_h_a -> payoff received by a certain action
-			int[] v_h_a = new int[Action.Actions.length];
+			double[] v_h_a = new double[Action.Actions.length];
 			for(int i = 0;i<v_h_a.length;i++)
 			{
 				v_h_a[i] = 0;
 			}
-			int v_h = 0;
+			double v_h = 0;
 
 			for(int ix = 0;ix<Action.Actions.length;ix++)
 			{
@@ -137,15 +139,15 @@ public class PluribusTrainer {
             int random_action = distribution.sample();
 			String action = Action.Actions[random_action];
 			history.forward(action);
-			int v_h = this.traverse_mc_cfr(cards, history, traverser, prune);
+			double v_h = this.traverse_mc_cfr(cards, history, traverser, prune);
 			history.backward();
 			return v_h;
 		}
 	}
 
-	public int[] train(int iterations, int[] PLAYERS, int strategy_interval, int prune_Threshold, int LCFR_Threshold, int discount_Interval, int discount)
+	public double[] train(int iterations, int[] PLAYERS, int strategy_interval, int prune_Threshold, int LCFR_Threshold, int discount_Interval, double discount)
 	{
-		int[] util = new int[] {0, 0};
+		double[] util = new double[] {0, 0};
 		List<String> kuhn_cards= new ArrayList<String>();
 		kuhn_cards.add("J");
 		kuhn_cards.add("Q");
@@ -153,29 +155,20 @@ public class PluribusTrainer {
 
 		for (int t=1; t<iterations; t++)
 		{
-			Random rand = new Random();
-			
-			int discardCard = rand.nextInt(kuhn_cards.size());
 			
 			List<String> cards = new ArrayList<String>();
 			cards.addAll(kuhn_cards);
-			cards.remove(discardCard);
+			//Shuffling the list
+			Collections.shuffle(cards);
+			//Removing the first card from the list
+			cards.remove(0);
 			
-			//Reversing the list elements since the player 0 would've never
-			//be able to get the K card
-			if(rand.nextInt(2) == 1)
-			{
-				String tmp_first_card = cards.get(0);
-				cards.set(0, cards.get(1));
-				cards.set(1, tmp_first_card);
-				
-			}
-
 			for (int p_i : PLAYERS) {
 				if (t % strategy_interval == 0)
 					this.update_strategy(cards, new History(), p_i);
 				if (t > prune_Threshold)
 				{
+					Random rand = new Random();
 					float chance = rand.nextFloat();
 					if(chance < 0.05)
 						util[p_i] += this.traverse_mc_cfr(cards, new History(), p_i, false);
@@ -188,7 +181,7 @@ public class PluribusTrainer {
 			
 			if (t < LCFR_Threshold && t % discount_Interval == 0)
 			{
-				float discounted = (t/discount) / (t/discount + 1);
+				double discounted = (t/discount) / (t/discount + 1);
 				for(String i_set_key : infoset_map.keySet())
 				{
 					InformationSet i_set_val = infoset_map.get(i_set_key);

@@ -33,8 +33,8 @@ public class KuhnPoker {
 		}
 		else if (history.equals("CBC"))
 		{
-			payoffs[0] = 1;
-			payoffs[1] = -1;
+			payoffs[0] = -1;
+			payoffs[1] = 1;
 		}
 		else //CC or BB or CBB
 		{
