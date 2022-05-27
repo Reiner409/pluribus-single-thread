@@ -8,5 +8,4 @@ public class Action {
 	public Action() {
 		Actions = new String[] {"B","C"};
 	}
-	
 }

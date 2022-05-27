@@ -19,7 +19,7 @@ public class PluribusMain {
 		//number of players = 2
 		int[] Players = new int[] {0,1};
 
-		int iterations = 50_000;
+		int iterations = 500_000;
 		int strategy_Interval = 10;
 		int prune_Threshold = 5_000;
 		int LCFR_Threshold = 5_000;
